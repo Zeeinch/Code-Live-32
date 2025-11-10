@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { getVideoDuration } from '../utils/helpers';
-import type { VideoFile } from '../types';
-import UploadIcon from './icons/UploadIcon';
+import { getVideoDuration } from '../utils/helpers.ts';
+import type { VideoFile } from '../types.ts';
+import UploadIcon from './icons/UploadIcon.tsx';
 
 interface FileUploadProps {
   onFilesUploaded: (files: VideoFile[]) => void;
@@ -43,14 +43,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFilesUploaded, isLoading: isA
     }
   }, [onFilesUploaded]);
 
-  // FIX: Changed event type from React.DragEvent<HTMLDivElement> to React.DragEvent<HTMLLabelElement> to match the element it's attached to.
   const onDrop = useCallback((event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     event.stopPropagation();
     handleFileProcessing(event.dataTransfer.files);
   }, [handleFileProcessing]);
 
-  // FIX: Changed event type from React.DragEvent<HTMLDivElement> to React.DragEvent<HTMLLabelElement> to match the element it's attached to.
   const onDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     event.stopPropagation();

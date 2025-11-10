@@ -1,7 +1,6 @@
-
 import React, { useRef, useState, useEffect } from 'react';
-import type { MontagePlan } from '../types';
-import PlayIcon from './icons/PlayIcon';
+import type { MontagePlan } from '../types.ts';
+import PlayIcon from './icons/PlayIcon.tsx';
 
 interface MontagePreviewProps {
   plan: MontagePlan | null;
@@ -120,4 +119,3 @@ const MontagePreview: React.FC<MontagePreviewProps> = ({ plan, audioBuffer, audi
 };
 
 export default MontagePreview;
-

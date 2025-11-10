@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import type { VideoFile, MontageClip, MontagePlan } from './types';
-import { generateStory, generateSpeech } from './services/geminiService';
-import { decode, decodeAudioData } from './utils/helpers';
-import PromptForm from './components/PromptForm';
-import FileUpload from './components/FileUpload';
-import MontagePreview from './components/MontagePreview';
+import type { VideoFile, MontageClip, MontagePlan } from './types.ts';
+import { generateStory, generateSpeech } from './services/geminiService.ts';
+import { decode, decodeAudioData } from './utils/helpers.ts';
+import PromptForm from './components/PromptForm.tsx';
+import FileUpload from './components/FileUpload.tsx';
+import MontagePreview from './components/MontagePreview.tsx';
 
 export default function App() {
   const [isLoadingStory, setIsLoadingStory] = useState(false);
