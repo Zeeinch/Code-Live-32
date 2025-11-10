@@ -1,85 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
+<html lang="id">
+<head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#000000" />
-    <title>Audio-First Video Montage</title>
+    <title>AI Story Video Montage</title>
+    
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      body {
-        background-color: #111827;
-        color: #f3f4f6;
-      }
-    </style>
     
-    <!-- Load Dependencies: SystemJS dan Babel -->
-    <script src="https://unpkg.com/systemjs@6.14.3/dist/s.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- SystemJS for module loading in the browser -->
+    <script src="https://aistudiocdn.com/systemjs@6.15.1/dist/system.min.js"></script>
+    <script src="https://aistudiocdn.com/systemjs@6.15.1/dist/extras/transform.min.js"></script>
     
-    <!--
-      Peta Impor SystemJS
-      Memetakan nama modul ke URL sebenarnya.
-    -->
+    <!-- Babel for transpiling JSX and TypeScript -->
+    <script src="https://aistudiocdn.com/@babel/standalone@7.24.8/babel.min.js"></script>
+    
+    <!-- SystemJS Babel plugin to integrate Babel with SystemJS -->
+    <script src="https://aistudiocdn.com/systemjs-plugin-babel@0.0.25/plugin-babel.js"></script>
+    
+    <!-- Import map to tell SystemJS where to find modules like React -->
     <script type="systemjs-importmap">
     {
       "imports": {
-        "react": "https://aistudiocdn.com/react@^19.2.0",
-        "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
+        "react": "https://aistudiocdn.com/react@18.2.0",
+        "react-dom": "https://aistudiocdn.com/react-dom@18.2.0",
+        "react-dom/client": "https://aistudiocdn.com/react-dom@18.2.0/client",
         "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0"
       }
     }
     </script>
     
-    <!--
-      Konfigurasi SystemJS
-      Skrip ini mengkonfigurasi SystemJS untuk menggunakan Babel untuk mentranspilasi file TSX/TS
-      secara on-the-fly di browser. Ini melewati masalah MIME type server.
-    -->
     <script>
-      (function () {
-        // Simpan fungsi fetch asli
-        const originalFetch = System.constructor.prototype.fetch;
-
-        // Buat fungsi fetch kustom для SystemJS
-        System.constructor.prototype.fetch = function (url, options) {
-          // Periksa apakah file adalah file TypeScript/JSX lokal
-          const isLocalTSX = url.startsWith('./') && (url.endsWith('.ts') || url.endsWith('.tsx'));
-
-          if (isLocalTSX) {
-            // Jika ya, ambil sebagai teks
-            return fetch(url, options)
-              .then(function(res) {
-                if (!res.ok) {
-                  throw new Error('Network response was not ok for ' + url);
-                }
-                return res.text();
-              })
-              .then(function(source) {
-                 // Transpilasi kode sumber menggunakan Babel
-                 const transformed = Babel.transform(source, {
-                    presets: ['react', 'typescript'],
-                    filename: url // Untuk pesan error dan source map yang lebih baik
-                 }).code;
-                 
-                 // Kembalikan kode yang ditranspilasi sebagai modul JavaScript
-                 return new Response(new Blob([transformed], { type: 'application/javascript' }));
-              });
+      // Configure SystemJS to use Babel for transpilation of .ts and .tsx files
+      System.config({
+        transpiler: 'plugin-babel',
+        meta: {
+          '*.tsx': {
+            loader: 'plugin-babel'
+          },
+          '*.ts': {
+            loader: 'plugin-babel'
           }
-          
-          // Untuk semua file lain (seperti dari peta impor), gunakan fetch asli
-          return originalFetch.call(this, url, options);
-        };
-
-        // Gunakan SystemJS untuk mengimpor titik masuk utama aplikasi
-        System.import('./index.tsx').catch(function(err) {
-            console.error('SystemJS gagal memuat aplikasi.', err);
-        });
-      })();
+        },
+        babelOptions: {
+          // Tell Babel to transpile React (JSX) and TypeScript
+          react: true,
+          typescript: true,
+          // This plugin is crucial for SystemJS to work with standard import/export syntax
+          plugins: ['transform-modules-systemjs']
+        }
+      });
     </script>
-
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.2.0",
@@ -90,9 +62,19 @@
 }
 </script>
 </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+<body class="bg-gray-900">
+    <!-- This is the root element where the React app will be mounted -->
     <div id="root"></div>
-    <!-- Aplikasi akan di-mount di sini oleh skrip -->
-  </body>
+
+    <!-- The entry point of the application. SystemJS will load and transpile it. -->
+    <script type="systemjs-module">
+      System.import('./index.tsx').catch(function(err) {
+        console.error("SystemJS failed to load the application.", err);
+        const rootEl = document.getElementById('root');
+        if (rootEl) {
+            rootEl.innerHTML = '<div style="color: red; padding: 20px; font-family: monospace;"><h1>Application Load Error</h1><p>Could not load the application. Check the browser console for details.</p><pre>' + (err.stack || err) + '</pre></div>';
+        }
+      });
+    </script>
+</body>
 </html>
