@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -14,23 +13,86 @@
         color: #f3f4f6;
       }
     </style>
+    
+    <!-- Load Dependencies: SystemJS dan Babel -->
+    <script src="https://unpkg.com/systemjs@6.14.3/dist/s.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!--
+      Peta Impor SystemJS
+      Memetakan nama modul ke URL sebenarnya.
+    -->
+    <script type="systemjs-importmap">
+    {
+      "imports": {
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
+        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0"
+      }
+    }
+    </script>
+    
+    <!--
+      Konfigurasi SystemJS
+      Skrip ini mengkonfigurasi SystemJS untuk menggunakan Babel untuk mentranspilasi file TSX/TS
+      secara on-the-fly di browser. Ini melewati masalah MIME type server.
+    -->
+    <script>
+      (function () {
+        // Simpan fungsi fetch asli
+        const originalFetch = System.constructor.prototype.fetch;
+
+        // Buat fungsi fetch kustom для SystemJS
+        System.constructor.prototype.fetch = function (url, options) {
+          // Periksa apakah file adalah file TypeScript/JSX lokal
+          const isLocalTSX = url.startsWith('./') && (url.endsWith('.ts') || url.endsWith('.tsx'));
+
+          if (isLocalTSX) {
+            // Jika ya, ambil sebagai teks
+            return fetch(url, options)
+              .then(function(res) {
+                if (!res.ok) {
+                  throw new Error('Network response was not ok for ' + url);
+                }
+                return res.text();
+              })
+              .then(function(source) {
+                 // Transpilasi kode sumber menggunakan Babel
+                 const transformed = Babel.transform(source, {
+                    presets: ['react', 'typescript'],
+                    filename: url // Untuk pesan error dan source map yang lebih baik
+                 }).code;
+                 
+                 // Kembalikan kode yang ditranspilasi sebagai modul JavaScript
+                 return new Response(new Blob([transformed], { type: 'application/javascript' }));
+              });
+          }
+          
+          // Untuk semua file lain (seperti dari peta impor), gunakan fetch asli
+          return originalFetch.call(this, url, options);
+        };
+
+        // Gunakan SystemJS untuk mengimpor titik masuk utama aplikasi
+        System.import('./index.tsx').catch(function(err) {
+            console.error('SystemJS gagal memuat aplikasi.', err);
+        });
+      })();
+    </script>
+
   <script type="importmap">
 {
   "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0"
   }
 }
 </script>
-<!-- Menambahkan Babel untuk kompilasi JSX & TypeScript di browser -->
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <!-- Memuat komponen utama React, dengan Babel yang akan mentransformasikannya -->
-    <script type="text/babel" data-presets="react,typescript" data-type="module" src="./index.tsx"></script>
+    <!-- Aplikasi akan di-mount di sini oleh skrip -->
   </body>
 </html>
