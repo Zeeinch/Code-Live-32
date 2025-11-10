@@ -5,58 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Story Video Montage</title>
     
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!--
-      Load UMD (Universal Module Definition) builds of libraries.
-      These create global variables (React, ReactDOM, System, Babel) that can be used by other scripts.
-      This fixes the 'Unexpected token export' errors.
-    -->
+    <!-- UMD builds create global variables (React, ReactDOM) -->
     <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+    
+    <!-- Core tools for in-browser transpilation and module loading -->
     <script src="https://unpkg.com/systemjs@6.13.0/dist/system.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.15.0/babel.min.js"></script>
     
     <script type="systemjs-importmap">
     {
       "imports": {
-        "react": "./empty-module.js",
-        "react-dom": "./empty-module.js",
-        "react-dom/client": "./empty-module.js",
         "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0"
       }
     }
     </script>
     
     <script>
-      // Create dummy modules for global libraries so SystemJS doesn't try to fetch them again
-      System.set(System.resolve('./empty-module.js'), System.newModule({}));
-
       // Configure SystemJS to use the global Babel object for transpilation
+      // and to recognize the globally loaded React/ReactDOM libraries.
       System.config({
         meta: {
+          // Tell SystemJS that these modules are already loaded and available as global variables.
+          // This prevents it from trying to fetch them.
+          'react': { format: 'global', exports: 'React' },
+          'react-dom': { format: 'global', exports: 'ReactDOM' },
+          'react-dom/client': { format: 'global', exports: 'ReactDOM' },
+
+          // Provide Babel options for TS/TSX files.
           '*.tsx': {
             'babelOptions': {
               'react': true,
               'typescript': true
-            },
-            'loader': 'babel'
+            }
           },
           '*.ts': {
              'babelOptions': {
               'typescript': true
-            },
-            'loader': 'babel'
-          },
-          'babel': {
-            'format': 'global',
-            'exports': 'Babel'
+            }
           }
         },
-        map: {
-          'babel': 'https://unpkg.com/@babel/standalone@7.15.0/babel.min.js'
-        },
+        // Tell SystemJS to use the globally available 'Babel' object as the transpiler.
         transpiler: 'babel'
       });
     </script>
