@@ -13,6 +13,8 @@
     
     <!-- Core tools for in-browser transpilation and module loading -->
     <script src="https://unpkg.com/systemjs@6.13.0/dist/system.min.js"></script>
+    <!-- This script brings back the System.config API for backward compatibility -->
+    <script src="https://unpkg.com/systemjs@6.13.0/dist/extras/legacy-config.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.15.0/babel.min.js"></script>
     
     <script type="systemjs-importmap">
@@ -26,10 +28,10 @@
     <script>
       // Configure SystemJS to use the global Babel object for transpilation
       // and to recognize the globally loaded React/ReactDOM libraries.
+      // This will now work because of legacy-config.js
       System.config({
         meta: {
           // Tell SystemJS that these modules are already loaded and available as global variables.
-          // This prevents it from trying to fetch them.
           'react': { format: 'global', exports: 'React' },
           'react-dom': { format: 'global', exports: 'ReactDOM' },
           'react-dom/client': { format: 'global', exports: 'ReactDOM' },
