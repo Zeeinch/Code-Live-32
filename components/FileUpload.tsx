@@ -1,4 +1,3 @@
-
 import React, { useCallback, useState } from 'react';
 import { getVideoDuration } from '../utils/helpers';
 import type { VideoFile } from '../types';
@@ -44,13 +43,15 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFilesUploaded, isLoading: isA
     }
   }, [onFilesUploaded]);
 
-  const onDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+  // FIX: Changed event type from React.DragEvent<HTMLDivElement> to React.DragEvent<HTMLLabelElement> to match the element it's attached to.
+  const onDrop = useCallback((event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     event.stopPropagation();
     handleFileProcessing(event.dataTransfer.files);
   }, [handleFileProcessing]);
 
-  const onDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+  // FIX: Changed event type from React.DragEvent<HTMLDivElement> to React.DragEvent<HTMLLabelElement> to match the element it's attached to.
+  const onDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     event.stopPropagation();
   };
