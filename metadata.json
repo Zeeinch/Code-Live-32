@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Audio-First Video Montage",
+  "description": "An application to automatically create video montages. It uses the duration of an audio file as a template to stitch together video clips.",
+  "requestFramePermissions": []
+}
